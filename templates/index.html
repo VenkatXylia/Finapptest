@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Personal Finance Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Personal Finance Manager</h1>
+        <div>
+            <a href="{{ url_for('add_entry') }}" class="btn btn-success me-2">Add Entry</a>
+            <a href="{{ url_for('export') }}" class="btn btn-secondary me-2">Export to CSV</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+    <div class="alert alert-info">
+        <strong>Current Balance:</strong> ${{ balance }}
+    </div>
+    {% if chart %}
+        <div class="mb-4 text-center">
+            <img src="data:image/png;base64,{{ chart }}" alt="Expenses by Category" class="img-fluid rounded shadow">
+        </div>
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.date }}</td>
+                    <td>{{ entry.description }}</td>
+                    <td>
+                        <span class="badge {% if entry.type == 'income' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ entry.type.capitalize() }}
+                        </span>
+                    </td>
+                    <td>{{ entry.category }}</td>
+                    <td>${{ entry.amount }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this entry?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
